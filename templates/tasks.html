@@ -51,6 +51,7 @@
                 <th scope="col">Due Date</th>
                 <th scope="col">Remove</th>
                 <th scope="col">Complete</th>
+                <th scope="col">Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,7 +61,8 @@
                         <td>{{task.status}}</td>
                         <td>{{task.dueDate}}</td>
                         <td><a href="/delete/{{task.id}}">X</a></td>
-                        <td><a href="/complete/{{task.id}}">C</a></td>                        
+                        <td><a href="/complete/{{task.id}}">C</a></td>
+                        <td><a href="/edit/{{task.id}}">E</a></td>                        
                         <!-- <td><a href="/delete/{{loop.index0}}">X</a></td> -->
                         <!-- <td><a href="/complete/{{loop.index0}}">C</a></td> -->
                     </tr>                    
