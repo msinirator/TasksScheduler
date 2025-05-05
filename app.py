@@ -131,6 +131,22 @@ def delete_task(task_id):
     # return render_template('index.html', tasks = tasks)
 
 
+@app.route('/edit/<int:task_id>', methods=['GET','POST'])
+def edit_task(task_id):
+
+    task = Task_db.query.get(task_id)
+
+    if request.method == 'POST':
+
+        task.name = request.form['taskName']
+        db.session.commit()
+
+        tasks = Task_db.query.all()
+        return render_template('tasks.html', tasks = tasks)
+
+    return render_template('edit.html', task = task)
+
+
 @app.route('/complete/<int:task_id>')
 def complete_task(task_id):
 
