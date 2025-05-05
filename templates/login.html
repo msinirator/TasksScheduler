@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <br><br>
+    <center>
+        <form action="/signIn">
+            <input type="text" name="userName" placeholder="User Name" required> <br><br>
+            <input type="text" name="userPass" placeholder="Pasword" required> <br><br>
+    
+            <button type="submit">Sign In</button>
+            <button type="submit" formaction="/signUp" formmethod="post">Sign Up</button>
+        </form>
+
+        <br>
+
+        <p>{{message}}</p>
+
+        <br>
+        <br>
+    </center>
+</body>
+</html>
