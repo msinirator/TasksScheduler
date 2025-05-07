@@ -49,6 +49,10 @@ class Task:
         self.dueDate = dueDate
 
 
+@app.before_request
+def create_tables():
+    db.create_all()
+    
 # app = Flask(__name__)
 # tasks = []
 
@@ -76,7 +80,7 @@ def signIn():
 
     if results.first():
         tasks = Task_db.query.all()
-        return render_template('tasks.html', tasks = tasks)
+        return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
     else:
         return render_template('login.html', message = "Login failed")
     
@@ -103,7 +107,7 @@ def add_task():
     db.session.commit()
 
     tasks = Task_db.query.all()
-    return render_template('tasks.html', tasks = tasks)
+    return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
 
 
     # taskName = request.form['taskName']
@@ -123,7 +127,7 @@ def delete_task(task_id):
     db.session.commit()
 
     tasks = Task_db.query.all()
-    return render_template('tasks.html', tasks = tasks)
+    return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
 
     # if 0 <= task_id < len(tasks):
     #     tasks.pop(task_id)
@@ -142,7 +146,7 @@ def edit_task(task_id):
         db.session.commit()
 
         tasks = Task_db.query.all()
-        return render_template('tasks.html', tasks = tasks)
+        return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
 
     return render_template('edit.html', task = task)
 
@@ -156,7 +160,7 @@ def complete_task(task_id):
     db.session.commit()
 
     tasks = Task_db.query.all()
-    return render_template('tasks.html', tasks = tasks)
+    return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
 
 
     # myTask = tasks[task_id]
@@ -176,7 +180,7 @@ def clearTasks():
     db.session.commit()
 
     tasks = Task_db.query.all()
-    return render_template('tasks.html', tasks = tasks)
+    return render_template('tasks.html', tasks = tasks, taskCount = len(tasks))
 
 
 
