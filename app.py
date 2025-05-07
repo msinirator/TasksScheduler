@@ -52,7 +52,7 @@ class Task:
 @app.before_request
 def create_tables():
     db.create_all()
-    
+
 # app = Flask(__name__)
 # tasks = []
 
@@ -185,7 +185,8 @@ def clearTasks():
 
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(host='0.0.0.0', debug=True)
+    # app.run(debug = True)
 
 
 
