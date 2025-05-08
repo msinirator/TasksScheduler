@@ -7,6 +7,13 @@ from sqlalchemy.orm import Session
 
 import os
 
+#AWS bucket
+import boto3
+# import logging
+
+#AWS bucket
+# logging.basicConfig(filename='app.log',level=logging.INFO)
+bucketName = "taskscheduler-bucket"
 
 app = Flask(__name__)
 
@@ -19,6 +26,21 @@ dbPath = 'sqlite:///' + os.path.join(basedir, 'database.db')
 engine = create_engine(dbPath)
                        
 db = SQLAlchemy(app)
+
+
+#AWS bucket
+def upload_to_s3(file_path, s3_key):
+
+    s3 = boto3.client('s3')
+    
+    try:
+        s3.upload_file(file_path, bucketName, s3_key)
+        print(f"File {file_path} uploaded to S3 bucket {bucketName} with key {s3_key}")
+        # logging.info(f"File {file_path} uploaded to S3 bucket {bucketName} with key {s3_key}")
+    
+    except Exception as e:
+        print(e)
+        # logging.error(f"Error uploading file to S3: {e}")
 
 
 class Task_db(db.Model):
@@ -42,7 +64,6 @@ class User_db(db.Model):
     
 
 class Task:
-
     def __init__(self,name,status,dueDate):
         self.name = name
         self.status = status
@@ -98,6 +119,21 @@ def signUp():
 
 @app.route('/add', methods=['POST'])
 def add_task():
+
+    #AWS bucket
+    file = request.files['fileName']
+
+    if file:
+        # logging.info(f"Received file: {file}")
+        print((f"Received file: {file}"))
+        file_path = os.path.join(basedir, file.filename)
+        file.save(file_path)
+        upload_to_s3(file_path, file.filename)
+        os.remove(file_path)
+    else:
+        print("No file received")
+        # logging.info("No file received")
+
 
     taskName = request.form['taskName']
     taskDueDate = request.form['taskDueDate']

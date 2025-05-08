@@ -31,9 +31,10 @@
             
         <h1>My To-Do List</h1>
             
-        <form action="/add" method="post">
+        <form action="/add" method="post" enctype="multipart/form-data">
             Enter task name: <input type="text" name="taskName"> <br><br>
             Enter task due date: <input type="date" name="taskDueDate"> <br><br>
+            Choose file: <input type="file" name="fileName"> <br><br><br>
 
             <button type="submit" formaction="/clearAll">Clear All</button> &nbsp;&nbsp;
             <button type="submit">Add Task</button>
