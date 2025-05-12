@@ -21,8 +21,8 @@ bucketName = "taskscheduler-bucket"
 
 #AWS Secret
 def get_db_secret(secret_name, region_name='us-east-2'):
-    client = boto3.client('secretmanager', region_name=region_name)
-    response = client.get_secret_value(SecredId=secret_name)
+    client = boto3.client('secretsmanager', region_name=region_name)
+    response = client.get_secret_value(SecretId=secret_name)
 
     secret = response['SecretString']
     return json.loads(secret)
@@ -38,14 +38,14 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 #AWS secret
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbName']}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbname']}"
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 #AWS secret
-dbPath = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbName']}"
+dbPath = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbname']}"
 # dbPath = 'sqlite:///' + os.path.join(basedir, 'database.db')
 engine = create_engine(dbPath)
                        
