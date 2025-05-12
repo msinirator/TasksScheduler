@@ -29,7 +29,7 @@
 
         <center>
             
-        <h1>My To-Do List</h1>
+        <h1>Tasks Scheduler</h1>
             
         <form action="/add" method="post" enctype="multipart/form-data">
             Enter task name: <input type="text" name="taskName"> <br><br>
@@ -54,6 +54,7 @@
                 <th scope="col">Remove</th>
                 <th scope="col">Complete</th>
                 <th scope="col">Edit</th>
+                <th scope="col">Attachment</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +65,12 @@
                         <td>{{task.dueDate}}</td>
                         <td><a href="/delete/{{task.id}}">X</a></td>
                         <td><a href="/complete/{{task.id}}">C</a></td>
-                        <td><a href="/edit/{{task.id}}">E</a></td>                        
+                        <td><a href="/edit/{{task.id}}">E</a></td>
+
+                        {% if task.attach_url %}
+                            <td><a href="{{task.attach_url}}">{{task.attach_name}}</a></td>
+                        {% endif %}
+
                         <!-- <td><a href="/delete/{{loop.index0}}">X</a></td> -->
                         <!-- <td><a href="/complete/{{loop.index0}}">C</a></td> -->
                     </tr>                    

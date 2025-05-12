@@ -6,26 +6,53 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 import os
+import json
+
 
 #AWS bucket
 import boto3
 # import logging
 
-#AWS bucket
+
 # logging.basicConfig(filename='app.log',level=logging.INFO)
+
+#AWS bucket
 bucketName = "taskscheduler-bucket"
+
+#AWS Secret
+def get_db_secret(secret_name, region_name='us-east-2'):
+    client = boto3.client('secretmanager', region_name=region_name)
+    response = client.get_secret_value(SecredId=secret_name)
+
+    secret = response['SecretString']
+    return json.loads(secret)
+
+#AWS secret
+#Fetch credentials from secrets manager
+secret = get_db_secret('prod/rds/mydb')
+
 
 app = Flask(__name__)
 
 # Get the directory of the current file
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
+#AWS secret
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbName']}"
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-dbPath = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
+#AWS secret
+dbPath = f"mysql+pymysql://{secret['username']}:{secret['password']}@{secret['host']}/{secret['dbName']}"
+# dbPath = 'sqlite:///' + os.path.join(basedir, 'database.db')
 engine = create_engine(dbPath)
                        
 db = SQLAlchemy(app)
+
+
+
 
 
 #AWS bucket
@@ -37,7 +64,8 @@ def upload_to_s3(file_path, s3_key):
         s3.upload_file(file_path, bucketName, s3_key)
         print(f"File {file_path} uploaded to S3 bucket {bucketName} with key {s3_key}")
         # logging.info(f"File {file_path} uploaded to S3 bucket {bucketName} with key {s3_key}")
-    
+        return f"https://{bucketName}.s3.amazonaws.com/{s3_key}"
+
     except Exception as e:
         print(e)
         # logging.error(f"Error uploading file to S3: {e}")
@@ -49,6 +77,8 @@ class Task_db(db.Model):
     name = db.Column(db.String(100), nullable=False)
     dueDate = db.Column(db.String(10), nullable=False)
     status = db.Column(db.String(20), nullable=False)
+    attach_url = db.Column(db.String(20), nullable=False)
+    attach_name = db.Column(db.String(20), nullable=False)
 
     def __repr__(self):
         return f'<Task {self.name}>'
@@ -122,13 +152,19 @@ def add_task():
 
     #AWS bucket
     file = request.files['fileName']
+    
+    attach_url = ""
+    attach_name = ""
 
     if file:
         # logging.info(f"Received file: {file}")
         print((f"Received file: {file}"))
+        attach_name = file.filename
+
         file_path = os.path.join(basedir, file.filename)
         file.save(file_path)
-        upload_to_s3(file_path, file.filename)
+        
+        attach_url = upload_to_s3(file_path, file.filename)
         os.remove(file_path)
     else:
         print("No file received")
@@ -138,7 +174,7 @@ def add_task():
     taskName = request.form['taskName']
     taskDueDate = request.form['taskDueDate']
 
-    new_task = Task_db(name=taskName, dueDate=taskDueDate, status="Pending")
+    new_task = Task_db(name=taskName, dueDate=taskDueDate, status="Pending", attach_url=attach_url, attach_name=attach_name)
     db.session.add(new_task)
     db.session.commit()
 
